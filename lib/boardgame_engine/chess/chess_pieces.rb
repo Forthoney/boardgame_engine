@@ -4,14 +4,14 @@ class ChessPiece
 
   def initialize(owner, name)
     @kill_log = []
-    @status = 'alive'
+    @status = "alive"
     @owner = owner
     @name = name
   end
 
   def kill(other)
     @kill_log.push(other)
-    other.status = 'dead'
+    other.status = "dead"
   end
 
   def to_s
@@ -52,7 +52,7 @@ class ChessPiece
   def clear_path?(row, col, end_row, end_col, board)
     current_tile = board.dig(row, col)
     if (row == end_row) && (col == end_col)
-      current_tile.nil? || (current_tile.owner != self.owner)
+      current_tile.nil? || (current_tile.owner != @owner)
     elsif current_tile.nil? || current_tile.equal?(self)
       next_cell(row, col, end_row, end_col) => [next_row, next_col]
       clear_path?(next_row, next_col, end_row, end_col, board)
@@ -73,15 +73,14 @@ class Pawn < ChessPiece
     return false unless valid_forward_move?(row, end_row)
 
     if col == end_col # only forward
-      result = board.dig(end_row, end_col).nil?
-      @first_move = false if result
-      result
+      valid_dest = board.dig(end_row, end_col).nil?
+      @first_move = false if valid_dest
+      return valid_dest
     elsif (col - end_col).abs == 1 # diagonal movement
       other_piece = board.dig(end_row, end_col)
-      other_piece && (other_piece.owner != @owner)
-    else
-      false
+      return other_piece && (other_piece.owner != @owner)
     end
+    false
   end
 
   private
@@ -97,7 +96,7 @@ end
 
 class Queen < ChessPiece
   def initialize(owner)
-    super(owner, 'Q')
+    super(owner, "Q")
   end
 
   def valid_move?(row, col, end_row, end_col, board)
@@ -109,7 +108,7 @@ end
 
 class Rook < ChessPiece
   def initialize(owner)
-    super(owner, 'R')
+    super(owner, "R")
   end
 
   def valid_move?(row, col, end_row, end_col, board)
@@ -120,7 +119,7 @@ end
 
 class Bishop < ChessPiece
   def initialize(owner)
-    super(owner, 'B')
+    super(owner, "B")
   end
 
   def valid_move?(row, col, end_row, end_col, board)
@@ -130,7 +129,7 @@ end
 
 class King < ChessPiece
   def initialize(owner)
-    super(owner, 'K')
+    super(owner, "K")
   end
 
   def valid_move?(row, col, end_row, end_col, board)
@@ -144,8 +143,8 @@ end
 
 class Knight < ChessPiece
   def initialize(owner)
-    #K was already taken by king, so I had to choose N
-    super(owner, 'N')
+    # K was already taken by king, so I had to choose N
+    super(owner, "N")
   end
 
   def valid_move?(row, col, end_row, end_col, board)
@@ -162,6 +161,6 @@ class Knight < ChessPiece
 
   def not_occupied(end_row, end_col, board)
     spot = board.dig(end_row, end_col)
-    return spot.nil? || spot.owner != self.owner
+    spot.nil? || spot.owner != @owner
   end
 end
