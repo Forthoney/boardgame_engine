@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChessPiece
   attr_accessor :status
   attr_reader :owner
@@ -39,12 +41,8 @@ class ChessPiece
     row_move = 0
     col_move = 0
 
-    if end_col != col
-      col_move = (end_col - col) / (end_col - col).abs
-    end
-    if end_row != row
-      row_move = (end_row - row) / (end_row - row).abs
-    end
+    col_move = (end_col - col) / (end_col - col).abs if end_col != col
+    row_move = (end_row - row) / (end_row - row).abs if end_row != row
 
     [row + row_move, col + col_move]
   end
@@ -64,7 +62,7 @@ end
 
 class Pawn < ChessPiece
   def initialize(owner, front)
-    super(owner, 'p')
+    super(owner, "p")
     @first_move = true
     @front = front
   end

@@ -32,7 +32,7 @@ class ChessBoard < BoardgameEngine::Board
 
   def set_non_pawns(player1, player2)
     pieces = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
-    pieces.each_with_index do |piece, idx| 
+    pieces.each_with_index do |piece, idx|
       @board[0][idx] = piece.new(player1)
       @board[7][7 - idx] = piece.new(player2)
     end
@@ -42,18 +42,18 @@ end
 class Chess < BoardgameEngine::Boardgame
   include TwoPlayers
 
-  def initialize(name1 = 'Player 1', name2 = 'Player 2')
+  def initialize(name1 = "Player 1", name2 = "Player 2")
     super(ChessBoard, INSTRUCTIONS, name1, name2)
   end
 
   def to_s
-    super('chess')
+    super("chess")
   end
 
   private
 
   def valid_input?(input)
-    coords = input.split(',')
+    coords = input.split(",")
     coords.all? { |c| c.match?(/[[:digit:]]/) && c.to_i.between?(0, 7) }
   end
 
@@ -63,24 +63,24 @@ class Chess < BoardgameEngine::Boardgame
 
   def select_piece
     input = proper_format_input
-    input.split(',').map(&:to_i) => [row, col]
+    input.split(",").map(&:to_i) => [row, col]
     if valid_piece? @board.board.dig(row, col)
       [row, col]
     else
-      puts 'Invalid piece. Try again'
+      puts "Invalid piece. Try again"
       select_piece
     end
   end
 
   def select_destination(piece, row, col)
-    input = proper_format_input(['back'])
-    return 'back' if input == 'back'
+    input = proper_format_input(["back"])
+    return "back" if input == "back"
 
-    input.split(',').map(&:to_i) => [end_row, end_col]
+    input.split(",").map(&:to_i) => [end_row, end_col]
     if piece.valid_move?(row, col, end_row, end_col, @board.board)
       [end_row, end_col]
     else
-      puts 'Invalid destination. Try again'
+      puts "Invalid destination. Try again"
       select_destination(piece, row, col)
     end
   end
@@ -91,7 +91,7 @@ class Chess < BoardgameEngine::Boardgame
     piece = @board.board[row][col]
     puts "Select where to move #{piece} to. Type back to reselect piece"
     dest = select_destination(piece, row, col)
-    return if dest == 'back'
+    return if dest == "back"
 
     killed = @board.move_piece(row, col, dest[0], dest[1])
     @winner = piece.owner if killed.is_a?(King)
