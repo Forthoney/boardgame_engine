@@ -1,20 +1,19 @@
 # frozen_string_literal: true
 
-require_relative '../boardgame'
-require_relative '../multiplayergame'
-require_relative 'chess_pieces'
+require "./lib/boardgame_engine"
+require "./lib/boardgame_engine/chess/chess_pieces"
 
-INSTRUCTIONS = "You can select spots on the board by inputting the row and \
-column with a comma in between. See example below\n1, 1\n"
-
-class ChessBoard < Board
+class ChessBoard < BoardgameEngine::Board
   attr_reader :board
+
+  INSTRUCTIONS = "You can select spots on the board by inputting the row and" \
+  "column with a comma in between. See example below\n1, 1\n"
 
   def initialize(player1, player2)
     super(8, 8)
     setup(player1, player2)
   end
-  
+
   def display
     super(show_row: true, show_col: true)
   end
@@ -40,7 +39,7 @@ class ChessBoard < Board
   end
 end
 
-class Chess < Boardgame
+class Chess < BoardgameEngine::Boardgame
   include TwoPlayers
 
   def initialize(name1 = 'Player 1', name2 = 'Player 2')
@@ -103,5 +102,3 @@ class Chess < Boardgame
     board.new(@player1, @player2)
   end
 end
-
-Chess.play

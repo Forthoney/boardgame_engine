@@ -6,7 +6,7 @@ Type in 'exit' anytime to exit the game fully"
 # All classes in this script are intended to be abstract, meaning they should
 # not be called on their own.
 
-module BoardGameEngine
+module BoardgameEngine
   # Class representing a physical board comprised of a grid in a board game. It
   # acts as both the View and Model if the project were to be compared to a MVC
   # model. It plays both roles as the board in a board game not only stores data,

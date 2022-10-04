@@ -1,12 +1,8 @@
 # frozen_string_literal: true
 
-require_relative '../boardgame'
-require_relative '../multiplayergame'
+require "./lib/boardgame_engine"
 
-INSTRUCTIONS = "You can select which column to drop you chip into by typing in \
-the row number."
-
-class Connect4Board < Board
+class Connect4Board < BoardgameEngine::Board
   def initialize
     super(6, 7)
   end
@@ -25,15 +21,18 @@ class Connect4Board < Board
   end
 end
 
-class Connect4 < Boardgame
+class Connect4 < BoardgameEngine::Boardgame
   include TwoPlayers
 
-  def initialize(name1 = 'Player 1', name2 = 'Player 2')
+  INSTRUCTIONS = "You can select which column to drop you chip into by typing" \
+  " in the row number."
+
+  def initialize(name1 = "Player 1", name2 = "Player 2")
     super(Connect4Board, INSTRUCTIONS, name1, name2)
   end
 
   def to_s
-    super('connect-four')
+    super("connect-four")
   end
 
   private
@@ -73,5 +72,3 @@ class Connect4 < Boardgame
     end
   end
 end
-
-Connect4.play
