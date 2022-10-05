@@ -3,11 +3,8 @@
 require "./lib/boardgame_engine"
 require "./lib/boardgame_engine/chess/chess_pieces"
 
-class ChessBoard < BoardgameEngine::Board
+class ChessBoard < Board
   attr_reader :board
-
-  INSTRUCTIONS = "You can select spots on the board by inputting the row and" \
-  "column with a comma in between. See example below\n1, 1\n"
 
   def initialize(player1, player2)
     super(8, 8)
@@ -39,11 +36,13 @@ class ChessBoard < BoardgameEngine::Board
   end
 end
 
-class Chess < BoardgameEngine::Boardgame
+class Chess < Boardgame
   include TwoPlayers
 
   def initialize(name1 = "Player 1", name2 = "Player 2")
-    super(ChessBoard, INSTRUCTIONS, name1, name2)
+    @instructions = "You can select spots on the board by inputting the row " \
+    "and column with a comma in between. See example below\n1, 1\n"
+    super(ChessBoard, @instructions, name1, name2)
   end
 
   def to_s

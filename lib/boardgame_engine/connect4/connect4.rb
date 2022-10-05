@@ -2,7 +2,7 @@
 
 require "./lib/boardgame_engine"
 
-class Connect4Board < BoardgameEngine::Board
+class Connect4Board < Board
   def initialize
     super(6, 7)
   end
@@ -21,14 +21,14 @@ class Connect4Board < BoardgameEngine::Board
   end
 end
 
-class Connect4 < BoardgameEngine::Boardgame
+class Connect4 < Boardgame
   include TwoPlayers
 
-  INSTRUCTIONS = "You can select which column to drop you chip into by typing" \
-  " in the row number."
+  @instructions = "You can select which column to drop you chip into by" \
+  " typing in the row number."
 
   def initialize(name1 = "Player 1", name2 = "Player 2")
-    super(Connect4Board, INSTRUCTIONS, name1, name2)
+    super(Connect4Board, @instructions, name1, name2)
   end
 
   def to_s
