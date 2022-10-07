@@ -2,10 +2,9 @@
 
 require_relative "boardgame_engine/version"
 
-require_relative "boardgame_engine/boardgame"
-require_relative "boardgame_engine/multiplayergame"
-require_relative "boardgame_engine/chess/chess"
-require_relative "boardgame_engine/connect4/connect4"
+require "boardgame_engine/boardgame"
+require "boardgame_engine/multiplayergame"
+require "boardgame_engine/sample_games"
 
 module BoardgameEngine
   class Error < StandardError; end
