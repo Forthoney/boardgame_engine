@@ -41,8 +41,8 @@ module SampleChess
     include TwoPlayers
 
     def initialize(name1 = "Player 1", name2 = "Player 2")
-      @instructions = "You can select spots on the board by inputting the row " \
-      "and column with a comma in between. See example below\n1, 1\n"
+      @instructions = "You can select spots on the board by inputting the row" \
+      " and column with a comma in between. See example below\n1, 1\n"
       super(ChessBoard, @instructions, name1, name2)
     end
 
