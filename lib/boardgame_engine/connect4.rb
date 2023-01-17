@@ -45,7 +45,7 @@ module SampleConnect4
 
     def play_turn
       puts "#{@turn}'s turn. Choose a column to drop your chip in"
-      col = proper_format_input.to_i
+      col = get_proper_input.to_i
       @board.drop_chip(col, @turn)
       @winner = @turn if win?
       change_turn

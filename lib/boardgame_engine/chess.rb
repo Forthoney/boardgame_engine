@@ -53,8 +53,8 @@ module SampleChess
     private
 
     def valid_input?(input)
-      coords = input.split(",")
-      coords.all? { |c| c.match?(/[[:digit:]]/) && c.to_i.between?(0, 7) }
+      # Allows input of form "n, n" where n is between 0 and 7
+      input.match?(/[0-7], [0-7]$/)
     end
 
     def valid_piece?(piece)
@@ -62,7 +62,7 @@ module SampleChess
     end
 
     def select_piece
-      input = proper_format_input
+      input = get_proper_input
       input.split(",").map(&:to_i) => [row, col]
       if valid_piece? @board.board.dig(row, col)
         [row, col]
@@ -73,7 +73,7 @@ module SampleChess
     end
 
     def select_destination(piece, row, col)
-      input = proper_format_input(["back"])
+      input = get_proper_input(["back"])
       return "back" if input == "back"
 
       input.split(",").map(&:to_i) => [end_row, end_col]

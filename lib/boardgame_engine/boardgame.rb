@@ -94,6 +94,7 @@ module BoardgameEngine
 
     def onboarding
       puts "Would you like a tutorial on how to play on this program? \n(y, n)"
+
       case gets.chomp
       when "y"
         tutorial
@@ -127,15 +128,16 @@ module BoardgameEngine
 
     protected
 
-    def proper_format_input(special_commands = [])
+    def get_proper_input(special_commands = [])
       input = gets.chomp
-      until valid_input?(input)
+
+      until valid_input?(input) || special_commands.include?(input)
         exit if input == "exit"
-        return input if special_commands.include?(input)
 
         puts "Input is in the wrong format or out of bounds. Try again"
         input = gets.chomp
       end
+
       input
     end
 
