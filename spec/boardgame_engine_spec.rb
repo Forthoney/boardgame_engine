@@ -50,3 +50,12 @@ describe SampleChess::ChessBoard do
     end
   end
 end
+
+describe BoardgameEngine::Boardgame do
+  describe "#tutorial" do
+    it "displays tutorial text in the command line before input" do
+      game = BoardgameEngine::Boardgame.new(BoardgameEngine::Board, "Test Instructions")
+      expect { game.tutorial }.to output("Test Instructions\n").to_stdout
+    end
+  end
+end
