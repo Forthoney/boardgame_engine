@@ -4,10 +4,23 @@
 module Boards
   # Boards laid out in grid format
   module Grid
+
+    # Make a 2D Array representing the board
+    #
+    # @param [Integer] row the number of rows
+    # @param [Integer] col the number of columns
+    #
+    # @return [Array<Array>] A 2D Array
     def generate_board(row, col)
       Array.new(row) { Array.new(col) { nil } }
     end
 
+    # Print a visual representation of the 
+    #
+    # @param [Boolean] show_row whether to show row labels
+    # @param [Boolean] show_col whether to show column labels
+    #
+    # @return [void]
     def display(show_row: false, show_col: false)
       if show_row
         @board.each_with_index { |row, idx| puts("#{idx} " + format_row(row)) }
@@ -20,6 +33,7 @@ module Boards
       column_spacer = show_row ? '  ' : ''
       puts format_col(column_spacer)
     end
+
 
     def get_piece_at(location)
       row, col = location
@@ -35,6 +49,10 @@ module Boards
       input.match?(/[0-#{@board.length - 1}], [0-#{@board[0].length - 1}]$/)
     end
 
+    def parse_input(input)
+      input.split(',').map(&:to_i)
+    end
+
     private
 
     def format_row(row)
@@ -42,7 +60,7 @@ module Boards
     end
 
     def format_col(column_spacer)
-      board[0].each_index.reduce(column_spacer) { |str, idx| str + " #{idx} " }
+      @board[0].each_index.reduce(column_spacer) { |str, idx| str + " #{idx} " }
     end
   end
 

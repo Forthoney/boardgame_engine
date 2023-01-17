@@ -22,6 +22,8 @@ module BoardgameEngine
   class Player
     attr_reader :name
 
+    # Creates a player object with the given name
+    # @param [String] name
     def initialize(name)
       @name = name
     end
@@ -31,7 +33,7 @@ module BoardgameEngine
     end
   end
 
-  # Class for running a board game.
+  # Class representing a board game.
   class Boardgame
     EXIT_INSTRUCTIONS ||= "Try a sample input or input 'back' to leave the " \
     "tutorial. Type in 'exit' anytime to exit the game fully"
@@ -104,7 +106,7 @@ module BoardgameEngine
       until @board.valid_board_input?(input) || special_commands.include?(input)
         exit if input == 'exit'
 
-        puts 'Imvalid input. Try again'
+        puts 'Invalid input. Try again'
         input = gets.chomp
       end
 

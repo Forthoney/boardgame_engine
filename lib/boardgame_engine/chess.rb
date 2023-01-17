@@ -142,22 +142,62 @@ module SampleChess
       @front = front
     end
 
-    def valid_move?(row, col, end_row, end_col, board)
+    # Check whether the intended destination is a valid destination
+    #
+    # @param [Array<Integer, Integer>] start_location the start coords
+    # @param [Array<Integer, Integer>] end_location the intended destination
+    # @param [ChessBoard] board the chess board
+    #
+    # @return [<Type>] whether the pawn can move to the intended destination
+    def valid_move?(start_location, end_location, board)
+      row, col = start_location
+      end_row, end_col = end_location
+
+      # Checks if moving 1 (or 2 if its the first move) cell forward
       return false unless valid_forward_move?(row, end_row)
 
-      if col == end_col # only forward
-        valid_dest = board.dig(end_row, end_col).nil?
-        @first_move = false if valid_dest
-        return valid_dest
-      elsif (col - end_col).abs == 1 # diagonal movement
-        other_piece = board.dig(end_row, end_col)
-        return other_piece && (other_piece.owner != @owner)
+      if col == end_col
+        valid_line_move?(end_row, end_col, board)
+      elsif (col - end_col).abs == 1 && (row + @front == end_row)
+        valid_diag_move?(end_row, end_col, board)
+      else
+        false
       end
-      false
     end
 
     private
 
+    # Check if the pawn can move in a straight line forward to the specified
+    # coord
+    #
+    # @param [Integer] end_row the destination row number
+    # @param [Integer] end_col the destination column number
+    #
+    # @return [Boolean] whether the pawn can move or not
+    def valid_line_move?(end_row, end_col, board)
+      is_valid_dest = board.get_piece_at([end_row, end_col]).nil?
+      @first_move = false if is_valid_dest
+      is_valid_dest
+    end
+
+    # Check if the pawn can move in a diagonal line to the specified coord
+    #
+    # @param [Integer] end_row the destination row number
+    # @param [Integer] end_col the destination column number
+    #
+    # @return [Boolean] whether the pawn can move or not
+    def valid_diag_move?(end_row, end_col, board)
+      other_piece = board.get_piece_at([end_row, end_col])
+      @first_move = false if other_piece
+      other_piece && (other_piece.owner != @owner)
+    end
+
+    # Check if the pawn movement is valid row-wise
+    #
+    # @param [Integer] row the row the pawn starts from
+    # @param [Integer] end_row the destination row
+    #
+    # @return [Boolean] whether the pawn's row movement is valid numerically
     def valid_forward_move?(row, end_row)
       if @first_move
         (row + @front * 2 == end_row) || (row + @front == end_row)
@@ -172,7 +212,10 @@ module SampleChess
       super(owner, 'Q')
     end
 
-    def valid_move?(row, col, end_row, end_col, board)
+    def valid_move?(start_location, end_location, board)
+      row, col = start_location
+      end_row, end_col = end_location
+
       valid_diag_move?(row, col, end_row, end_col, board) \
       || valid_horz_move?(row, col, end_row, end_col, board) \
       || valid_vert_move?(row, col, end_row, end_col, board)
@@ -184,7 +227,10 @@ module SampleChess
       super(owner, 'R')
     end
 
-    def valid_move?(row, col, end_row, end_col, board)
+    def valid_move?(start_location, end_location, board)
+      row, col = start_location
+      end_row, end_col = end_location
+
       valid_horz_move?(row, col, end_row, end_col, board) \
       || valid_vert_move?(row, col, end_row, end_col, board)
     end
@@ -195,7 +241,10 @@ module SampleChess
       super(owner, 'B')
     end
 
-    def valid_move?(row, col, end_row, end_col, board)
+    def valid_move?(start_location, end_location, board)
+      row, col = start_location
+      end_row, end_col = end_location
+
       valid_diag_move?(row, col, end_row, end_col, board)
     end
   end
@@ -205,7 +254,10 @@ module SampleChess
       super(owner, 'K')
     end
 
-    def valid_move?(row, col, end_row, end_col, board)
+    def valid_move?(start_location, end_location, board)
+      row, col = start_location
+      end_row, end_col = end_location
+
       return false unless (row - end_row).abs == 1 && (col - end_col).abs == 1
 
       valid_diag_move?(row, col, end_row, end_col, board) \
@@ -220,7 +272,10 @@ module SampleChess
       super(owner, 'N')
     end
 
-    def valid_move?(row, col, end_row, end_col, board)
+    def valid_move?(start_location, end_location, board)
+      row, col = start_location
+      end_row, end_col = end_location
+
       within_movement(row, col, end_row, end_col) \
       && not_occupied(end_row, end_col, board)
     end
