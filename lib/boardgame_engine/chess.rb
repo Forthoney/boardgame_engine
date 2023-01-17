@@ -1,14 +1,18 @@
 # frozen_string_literal: true
 
-require_relative "boardgame"
-require_relative "multiplayergame"
+require_relative 'boardgame'
+require_relative 'game_modules'
+require_relative 'board_modules'
 
 module SampleChess
   class ChessBoard < BoardgameEngine::Board
+    include Boards::Grid
+    include Boards::MovablePiece
+
     attr_reader :board
 
     def initialize(player1, player2)
-      super(8, 8)
+      @board = generate_board(8, 8)
       setup(player1, player2)
     end
 
@@ -38,68 +42,38 @@ module SampleChess
   end
 
   class Chess < BoardgameEngine::Boardgame
-    include TwoPlayers
+    include Games::CyclicalTurn
+    include Games::MovablePiece
 
-    def initialize(name1 = "Player 1", name2 = "Player 2")
-      @instructions = "You can select spots on the board by inputting the row" \
+    def initialize(names)
+      @instructions = 'You can select spots on the board by inputting the row' \
       " and column with a comma in between. See example below\n1, 1\n"
-      super(ChessBoard, @instructions, name1, name2)
+      super(ChessBoard, @instructions, names)
     end
 
     def to_s
-      super("chess")
+      super('chess')
+    end
+
+    def self.play(do_onboarding: true)
+      super.play(do_onboarding, 2)
     end
 
     private
-
-    def valid_input?(input)
-      # Allows input of form "n, n" where n is between 0 and 7
-      input.match?(/[0-7], [0-7]$/)
-    end
 
     def valid_piece?(piece)
       !piece.nil? && piece.owner == @turn
     end
 
-    def select_piece
-      input = get_proper_input
-      input.split(",").map(&:to_i) => [row, col]
-      if valid_piece? @board.board.dig(row, col)
-        [row, col]
-      else
-        puts "Invalid piece. Try again"
-        select_piece
-      end
-    end
-
-    def select_destination(piece, row, col)
-      input = get_proper_input(["back"])
-      return "back" if input == "back"
-
-      input.split(",").map(&:to_i) => [end_row, end_col]
-      if piece.valid_move?(row, col, end_row, end_col, @board.board)
-        [end_row, end_col]
-      else
-        puts "Invalid destination. Try again"
-        select_destination(piece, row, col)
-      end
-    end
-
     def play_turn
-      puts "#{@turn}'s turn\nSelect your piece"
-      select_piece => [row, col]
-      piece = @board.board[row][col]
-      puts "Select where to move #{piece} to. Type back to reselect piece"
-      dest = select_destination(piece, row, col)
-      return if dest == "back"
-
-      killed = @board.move_piece(row, col, dest[0], dest[1])
+      puts "#{@turn}'s turn"
+      killed = play_move
       @winner = piece.owner if killed.is_a?(King)
       change_turn
     end
 
     def setup_board(board)
-      board.new(@player1, @player2)
+      board.new(@players[0], @players[1])
     end
   end
 
@@ -108,15 +82,13 @@ module SampleChess
     attr_reader :owner
 
     def initialize(owner, name)
-      @kill_log = []
-      @status = "alive"
+      @status = 'alive'
       @owner = owner
       @name = name
     end
 
     def kill(other)
-      @kill_log.push(other)
-      other.status = "dead"
+      other.status = 'dead'
     end
 
     def to_s
@@ -155,7 +127,7 @@ module SampleChess
       if (row == end_row) && (col == end_col)
         current_tile.nil? || (current_tile.owner != @owner)
       elsif current_tile.nil? || current_tile.equal?(self)
-        next_cell(row, col, end_row, end_col) => [next_row, next_col]
+        next_row, next_col = next_cell(row, col, end_row, end_col)
         clear_path?(next_row, next_col, end_row, end_col, board)
       else
         false
@@ -165,7 +137,7 @@ module SampleChess
 
   class Pawn < ChessPiece
     def initialize(owner, front)
-      super(owner, "p")
+      super(owner, 'p')
       @first_move = true
       @front = front
     end
@@ -197,7 +169,7 @@ module SampleChess
 
   class Queen < ChessPiece
     def initialize(owner)
-      super(owner, "Q")
+      super(owner, 'Q')
     end
 
     def valid_move?(row, col, end_row, end_col, board)
@@ -209,7 +181,7 @@ module SampleChess
 
   class Rook < ChessPiece
     def initialize(owner)
-      super(owner, "R")
+      super(owner, 'R')
     end
 
     def valid_move?(row, col, end_row, end_col, board)
@@ -220,7 +192,7 @@ module SampleChess
 
   class Bishop < ChessPiece
     def initialize(owner)
-      super(owner, "B")
+      super(owner, 'B')
     end
 
     def valid_move?(row, col, end_row, end_col, board)
@@ -230,7 +202,7 @@ module SampleChess
 
   class King < ChessPiece
     def initialize(owner)
-      super(owner, "K")
+      super(owner, 'K')
     end
 
     def valid_move?(row, col, end_row, end_col, board)
@@ -245,7 +217,7 @@ module SampleChess
   class Knight < ChessPiece
     def initialize(owner)
       # K was already taken by king, so I had to choose N
-      super(owner, "N")
+      super(owner, 'N')
     end
 
     def valid_move?(row, col, end_row, end_col, board)

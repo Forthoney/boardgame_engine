@@ -3,7 +3,8 @@
 require_relative "boardgame_engine/version"
 
 require "boardgame_engine/boardgame"
-require "boardgame_engine/multiplayergame"
+require "boardgame_engine/game_modules"
+require "boardgame_engine/board_modules"
 require "boardgame_engine/sample_games"
 
 module BoardgameEngine

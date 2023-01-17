@@ -11,38 +11,7 @@ module BoardgameEngine
   class Board
     attr_reader :board
 
-    def initialize(row = 3, col = 3)
-      @board = Array.new(row) { Array.new(col) { nil } }
-    end
-
-    def display(show_row: false, show_col: false)
-      if show_row
-        @board.each_with_index { |row, idx| puts("#{idx} " + format_row(row)) }
-      else
-        @board.each { |row| puts format_row(row) }
-      end
-      return unless show_col
-
-      column_spacer = show_row ? "  " : ""
-      puts(@board[0].each_index.reduce(column_spacer) do |str, idx|
-        str + " #{idx} "
-      end)
-    end
-
-    def move_piece(start_row, start_col, end_row, end_col)
-      piece = @board[start_row][start_col]
-      @board[start_row][start_col] = nil
-      destination = @board[end_row][end_col]
-      @board[end_row][end_col] = piece
-
-      destination
-    end
-
     private
-
-    def format_row(row)
-      row.map { |elem| "[#{elem.nil? ? " " : elem}]" }.join
-    end
 
     def spot_playable?(piece, row, col)
       piece.possible_moves.include? [row, col]
@@ -67,20 +36,21 @@ module BoardgameEngine
     EXIT_INSTRUCTIONS ||= "Try a sample input or input 'back' to leave the " \
     "tutorial. Type in 'exit' anytime to exit the game fully"
 
-    def initialize(board, instructions, name1 = "Player 1", name2 = "Player 2")
-      @player1 = Player.new(name1)
-      @player2 = Player.new(name2)
+    def initialize(board, instructions, names)
+      @players = names.map { |name| Player.new name }
       @board = setup_board(board)
       @instructions = instructions
       @winner = nil
     end
 
-    def self.play(do_onboarding: true)
-      puts "What is Player 1's name?"
-      player1 = gets.chomp
-      puts "What is Player 2's name?"
-      player2 = gets.chomp
-      @game = new(player1, player2)
+    def self.play(do_onboarding, num_players = 2)
+      names = []
+      num_players.times do |i|
+        puts "What is Player #{i}'s name?"
+        names.push(gets.chomp)
+      end
+
+      @game = new(names)
 
       puts "Welcome to #{@game}!"
       @game.onboarding if do_onboarding
@@ -88,18 +58,18 @@ module BoardgameEngine
       @game.start
     end
 
-    def to_s(game_name = "boardgame")
-      "#{game_name} between #{@player1} and #{@player2}"
+    def to_s(game_name = 'boardgame')
+      "#{game_name} between #{@players.join(', ')}"
     end
 
     def onboarding
       puts "Would you like a tutorial on how to play on this program? \n(y, n)"
 
       case gets.chomp
-      when "y"
+      when 'y'
         tutorial
-      when "n"
-        puts "Skipping tutorial"
+      when 'n'
+        puts 'Skipping Tutorial'
       else
         puts 'Please answer either "y" or "n"'
         onboarding
@@ -109,14 +79,14 @@ module BoardgameEngine
     def tutorial
       puts @instructions + Boardgame::EXIT_INSTRUCTIONS
       input = gets.chomp
-      until input == "back"
-        exit if input == "exit"
-        puts valid_input?(input) ? "Valid input!" : "Invalid input"
+      until input == 'back'
+        exit if input == 'exit'
+        puts valid_input?(input) ? 'Valid input!' : 'Invalid input'
         input = gets.chomp
       end
     end
 
-    def start(turn = @player1)
+    def start(turn = @players[0])
       @turn = turn
       @board.display
       until @winner
@@ -128,13 +98,13 @@ module BoardgameEngine
 
     protected
 
-    def get_proper_input(special_commands = [])
+    def get_valid_board_input(special_commands = [])
       input = gets.chomp
 
-      until valid_input?(input) || special_commands.include?(input)
-        exit if input == "exit"
+      until @board.valid_board_input?(input) || special_commands.include?(input)
+        exit if input == 'exit'
 
-        puts "Input is in the wrong format or out of bounds. Try again"
+        puts 'Imvalid input. Try again'
         input = gets.chomp
       end
 

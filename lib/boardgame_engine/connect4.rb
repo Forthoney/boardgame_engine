@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "boardgame"
-require_relative "multiplayergame"
+require_relative "game_modules"
 
 module SampleConnect4
   class Connect4Board < BoardgameEngine::Board
@@ -24,17 +24,21 @@ module SampleConnect4
   end
 
   class Connect4 < BoardgameEngine::Boardgame
-    include TwoPlayers
+    include Games::CyclicalTurn
 
     @instructions = "You can select which column to drop you chip into by" \
     " typing in the row number."
 
-    def initialize(name1 = "Player 1", name2 = "Player 2")
-      super(Connect4Board, @instructions, name1, name2)
+    def initialize(names)
+      super(Connect4Board, @instructions, names)
     end
 
     def to_s
       super("connect-four")
+    end
+
+    def self.play(do_onboarding: true)
+      super.play(do_onboarding, 2)
     end
 
     private
@@ -45,7 +49,7 @@ module SampleConnect4
 
     def play_turn
       puts "#{@turn}'s turn. Choose a column to drop your chip in"
-      col = get_proper_input.to_i
+      col = get_valid_board_input.to_i
       @board.drop_chip(col, @turn)
       @winner = @turn if win?
       change_turn
