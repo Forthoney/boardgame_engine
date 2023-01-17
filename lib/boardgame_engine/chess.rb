@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'boardgame'
-require_relative 'game_modules'
-require_relative 'board_modules'
+require 'boardgame_engine/boardgame'
+require 'boardgame_engine/game_modules'
+require 'boardgame_engine/board_modules'
 
 module SampleChess
   class ChessBoard < BoardgameEngine::Board
@@ -55,10 +55,6 @@ module SampleChess
       super('chess')
     end
 
-    def self.play(do_onboarding: true)
-      super.play(do_onboarding, 2)
-    end
-
     private
 
     def valid_piece?(piece)
@@ -68,7 +64,7 @@ module SampleChess
     def play_turn
       puts "#{@turn}'s turn"
       killed = play_move
-      @winner = piece.owner if killed.is_a?(King)
+      @winner = @turn if killed.is_a?(King)
       change_turn
     end
 
@@ -77,65 +73,7 @@ module SampleChess
     end
   end
 
-  class ChessPiece
-    attr_accessor :status
-    attr_reader :owner
-
-    def initialize(owner, name)
-      @status = 'alive'
-      @owner = owner
-      @name = name
-    end
-
-    def kill(other)
-      other.status = 'dead'
-    end
-
-    def to_s
-      @name.to_s
-    end
-
-    protected
-
-    def valid_diag_move?(row, col, end_row, end_col, board)
-      ((end_row - row).abs == (end_col - col).abs) \
-      && clear_path?(row, col, end_row, end_col, board)
-    end
-
-    def valid_horz_move?(row, col, end_row, end_col, board)
-      (end_row == row) && clear_path?(row, col, end_row, end_col, board)
-    end
-
-    def valid_vert_move?(row, col, end_row, end_col, board)
-      (end_col == col) && clear_path?(row, col, end_row, end_col, board)
-    end
-
-    private
-
-    def next_cell(row, col, end_row, end_col)
-      row_move = 0
-      col_move = 0
-
-      col_move = (end_col - col) / (end_col - col).abs if end_col != col
-      row_move = (end_row - row) / (end_row - row).abs if end_row != row
-
-      [row + row_move, col + col_move]
-    end
-
-    def clear_path?(row, col, end_row, end_col, board)
-      current_tile = board.dig(row, col)
-      if (row == end_row) && (col == end_col)
-        current_tile.nil? || (current_tile.owner != @owner)
-      elsif current_tile.nil? || current_tile.equal?(self)
-        next_row, next_col = next_cell(row, col, end_row, end_col)
-        clear_path?(next_row, next_col, end_row, end_col, board)
-      else
-        false
-      end
-    end
-  end
-
-  class Pawn < ChessPiece
+  class Pawn < BoardgameEngine::Piece
     def initialize(owner, front)
       super(owner, 'p')
       @first_move = true
@@ -207,7 +145,7 @@ module SampleChess
     end
   end
 
-  class Queen < ChessPiece
+  class Queen < BoardgameEngine::Piece
     def initialize(owner)
       super(owner, 'Q')
     end
@@ -216,13 +154,13 @@ module SampleChess
       row, col = start_location
       end_row, end_col = end_location
 
-      valid_diag_move?(row, col, end_row, end_col, board) \
-      || valid_horz_move?(row, col, end_row, end_col, board) \
-      || valid_vert_move?(row, col, end_row, end_col, board)
+      clear_diag_path?(row, col, end_row, end_col, board) \
+      || clear_horz_path?(row, col, end_row, end_col, board) \
+      || clear_vert_path?(row, col, end_row, end_col, board)
     end
   end
 
-  class Rook < ChessPiece
+  class Rook < BoardgameEngine::Piece
     def initialize(owner)
       super(owner, 'R')
     end
@@ -231,12 +169,12 @@ module SampleChess
       row, col = start_location
       end_row, end_col = end_location
 
-      valid_horz_move?(row, col, end_row, end_col, board) \
-      || valid_vert_move?(row, col, end_row, end_col, board)
+      clear_horz_path?(row, col, end_row, end_col, board) \
+      || clear_vert_path?(row, col, end_row, end_col, board)
     end
   end
 
-  class Bishop < ChessPiece
+  class Bishop < BoardgameEngine::Piece
     def initialize(owner)
       super(owner, 'B')
     end
@@ -245,11 +183,11 @@ module SampleChess
       row, col = start_location
       end_row, end_col = end_location
 
-      valid_diag_move?(row, col, end_row, end_col, board)
+      clear_diag_path?(row, col, end_row, end_col, board)
     end
   end
 
-  class King < ChessPiece
+  class King < BoardgameEngine::Piece
     def initialize(owner)
       super(owner, 'K')
     end
@@ -260,13 +198,13 @@ module SampleChess
 
       return false unless (row - end_row).abs == 1 && (col - end_col).abs == 1
 
-      valid_diag_move?(row, col, end_row, end_col, board) \
-      || valid_horz_move?(row, col, end_row, end_col, board) \
-      || valid_vert_move?(row, col, end_row, end_col, board)
+      clear_diag_path?(row, col, end_row, end_col, board) \
+      || clear_horz_path?(row, col, end_row, end_col, board) \
+      || clear_vert_path?(row, col, end_row, end_col, board)
     end
   end
 
-  class Knight < ChessPiece
+  class Knight < BoardgameEngine::Piece
     def initialize(owner)
       # K was already taken by king, so I had to choose N
       super(owner, 'N')

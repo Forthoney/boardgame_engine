@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'boardgame'
-require_relative 'game_modules'
-require_relative 'board_modules'
+require 'boardgame_engine/boardgame'
+require 'boardgame_engine/game_modules'
+require 'boardgame_engine/board_modules'
 
 module SampleConnect4
   class Connect4Board < BoardgameEngine::Board

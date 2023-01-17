@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'chess'
-require_relative 'connect4'
+require 'boardgame_engine/chess'
+require 'boardgame_engine/connect4'
 
 module SampleGames
 end

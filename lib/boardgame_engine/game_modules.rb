@@ -3,7 +3,6 @@
 # Module for different game rules
 module Games
   # Module for games with a cyclical turn system
-  # @
   module CyclicalTurn
     # Changes the turn to the next player
     def change_turn
