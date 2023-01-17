@@ -11,7 +11,7 @@ module BoardgameEngine
   class Board
     attr_reader :board
 
-    def initialize(row, col)
+    def initialize(row = 3, col = 3)
       @board = Array.new(row) { Array.new(col) { nil } }
     end
 
