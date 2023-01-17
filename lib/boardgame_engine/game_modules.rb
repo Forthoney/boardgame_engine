@@ -8,8 +8,7 @@ module Games
     # Changes the turn to the next player
     def change_turn
       idx = @players.find_index(@turn)
-      next_idx = idx < @players.length ? idx + 1 : 0
-      @turn = @players[next_idx]
+      @turn = @players[(idx + 1) % @players.length]
     end
   end
 
