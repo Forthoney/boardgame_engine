@@ -3,9 +3,9 @@
 require 'boardgame_engine'
 
 describe SampleChess::ChessBoard do
-  describe "#display" do
-    it "shows starting board" do
-      board = SampleChess::ChessBoard.new("p1", "p2")
+  describe '#display' do
+    it 'shows starting board' do
+      board = SampleChess::ChessBoard.new('p1', 'p2')
       expect { board.display }.to output("0 [R][N][B][Q][K][B][N][R]\n" \
                                          "1 [p][p][p][p][p][p][p][p]\n" \
                                          "2 [ ][ ][ ][ ][ ][ ][ ][ ]\n" \

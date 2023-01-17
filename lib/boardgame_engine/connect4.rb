@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative "boardgame"
-require_relative "game_modules"
+require_relative 'boardgame'
+require_relative 'game_modules'
 
 module SampleConnect4
   class Connect4Board < BoardgameEngine::Board
@@ -26,15 +26,15 @@ module SampleConnect4
   class Connect4 < BoardgameEngine::Boardgame
     include Games::CyclicalTurn
 
-    @instructions = "You can select which column to drop you chip into by" \
-    " typing in the row number."
+    @instructions = 'You can select which column to drop you chip into by' \
+    ' typing in the row number.'
 
     def initialize(names)
       super(Connect4Board, @instructions, names)
     end
 
     def to_s
-      super("connect-four")
+      super('connect-four')
     end
 
     def self.play(do_onboarding: true)
@@ -57,9 +57,9 @@ module SampleConnect4
 
     def win?
       [@board.board,
-      @board.board.transpose,
-      align_diagonally(@board.board),
-      align_diagonally(@board.board.transpose)].each do |config|
+       @board.board.transpose,
+       align_diagonally(@board.board),
+       align_diagonally(@board.board.transpose)].each do |config|
         config.each { |direction| return true if four_in_a_row? direction }
       end
       false
