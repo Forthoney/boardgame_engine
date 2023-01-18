@@ -13,7 +13,9 @@ module Chess
 
     PLAY_INSTRUCTIONS = 'You can select spots on the board by inputting the ' \
     "row and column with a comma in between. See example below\n1, 1\n"
+
     GAME_NAME = 'Chess'
+    NUM_PLAYERS = 2
 
     def initialize(names)
       super(ChessBoard, names)
@@ -21,8 +23,14 @@ module Chess
 
     private
 
+    # Check whether a piece can be selected by the player
+    #
+    # @param [Piece] piece the piece being selected
+    #
+    # @return [Boolean] whether the piece exists and if so, if it belongs to
+    # the player currently going
     def valid_piece?(piece)
-      !piece.nil? && piece.owner == @turn
+      piece && piece.owner == @turn
     end
 
     def play_turn
@@ -87,7 +95,7 @@ module Chess
     # @param [Array<Integer, Integer>] end_location the intended destination
     # @param [ChessBoard] board the chess board
     #
-    # @return [<Type>] whether the pawn can move to the intended destination
+    # @return [Boolean] whether the pawn can move to the intended destination
     def valid_move?(start_location, end_location, board)
       row, col = start_location
       end_row, end_col = end_location
@@ -152,12 +160,9 @@ module Chess
     end
 
     def valid_move?(start_location, end_location, board)
-      row, col = start_location
-      end_row, end_col = end_location
-
-      clear_diag_path?(row, col, end_row, end_col, board) \
-      || clear_horz_path?(row, col, end_row, end_col, board) \
-      || clear_vert_path?(row, col, end_row, end_col, board)
+      board.clear_diag_path?(start_location, end_location) \
+      || board.clear_horz_path?(start_location, end_location) \
+      || board.clear_vert_path?(start_location, end_location)
     end
   end
 
@@ -170,8 +175,8 @@ module Chess
       row, col = start_location
       end_row, end_col = end_location
 
-      clear_horz_path?(row, col, end_row, end_col, board) \
-      || clear_vert_path?(row, col, end_row, end_col, board)
+      board.clear_horz_path?(row, col, end_row, end_col, board) \
+      || board.clear_vert_path?(row, col, end_row, end_col, board)
     end
   end
 
@@ -184,7 +189,7 @@ module Chess
       row, col = start_location
       end_row, end_col = end_location
 
-      clear_diag_path?(row, col, end_row, end_col, board)
+      board.clear_diag_path?(row, col, end_row, end_col, board)
     end
   end
 
@@ -199,9 +204,9 @@ module Chess
 
       return false unless (row - end_row).abs == 1 && (col - end_col).abs == 1
 
-      clear_diag_path?(row, col, end_row, end_col, board) \
-      || clear_horz_path?(row, col, end_row, end_col, board) \
-      || clear_vert_path?(row, col, end_row, end_col, board)
+      board.clear_diag_path?(row, col, end_row, end_col, board) \
+      || board.clear_horz_path?(row, col, end_row, end_col, board) \
+      || board.clear_vert_path?(row, col, end_row, end_col, board)
     end
   end
 

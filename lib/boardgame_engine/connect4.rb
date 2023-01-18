@@ -13,6 +13,7 @@ module Connect4
     PLAY_INSTRUCTIONS = 'You can select which column to drop you chip into by' \
     ' typing in the row number.'
     GAME_NAME = 'Connect-4'
+    NUM_PLAYERS = 2
 
     def initialize(names)
       super(Connect4Board, names)
@@ -41,6 +42,12 @@ module Connect4
       super(show_col: true)
     end
 
+    # Drop a chip from a certain player into a given column
+    #
+    # @param [Integer] col The column chosen by the player
+    # @param [Player] owner the player dropping the chip
+    #
+    # @return [void]
     def drop_chip(col, owner)
       @board.reverse_each do |row|
         if row[col].nil?

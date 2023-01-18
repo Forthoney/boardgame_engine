@@ -64,6 +64,49 @@ module Boards
       end
     end
 
+    # Check whether there exists a clear diagonal path from start to a
+    # destination
+    #
+    # @param [Array<Integer, Integer>] start_location the start location
+    # @param [Array<Integer, Integer>] end_location the intended destination
+    #
+    # @return [Boolean] true if there exists an unblocked path to destination
+    def clear_diag_path?(start_location, end_location)
+      row, col = start_location
+      end_row, end_col = end_location
+
+      ((end_row - row).abs == (end_col - col).abs) \
+      && clear_path?(row, col, end_row, end_col, board)
+    end
+
+    # Check whether there exists an unblocked horizontal path from start to
+    # a destination
+    #
+    # @param [Array<Integer, Integer>] start_location the start location
+    # @param [Array<Integer, Integer>] end_location the intended destination
+    #
+    # @return [Boolean] true if there exists an unblocked path to destination
+    def clear_horz_path?(start_location, end_location)
+      row, col = start_location
+      end_row, end_col = end_location
+
+      (end_row == row) && clear_path?(row, col, end_row, end_col, board)
+    end
+
+    # Check whether there exists an unblocked vertical path from start to
+    # a destination
+    #
+    # @param [Array<Integer, Integer>] start_location the start location
+    # @param [Array<Integer, Integer>] end_location the intended destination
+    #
+    # @return [Boolean] true if there exists an unblocked path to destination
+    def clear_vert_path?(start_location, end_location)
+      row, col = start_location
+      end_row, end_col = end_location
+
+      (end_col == col) && clear_path?(row, col, end_row, end_col, board)
+    end
+
     # Parse an input from the user that has a corresponding board location. This
     # must be used in after valid_board_input? has confirmed the input is in
     # the correct format
@@ -109,6 +152,47 @@ module Boards
     end
 
     private
+
+    # calculates the location of the next cell in the sequence of cells from a
+    # given start location and an end location
+    #
+    # @param [Integer] row
+    # @param [Integer] col
+    # @param [Integer] end_row
+    # @param [Integer] end_col
+    #
+    # @return [Array<Integer, Integer>] the next cell in the sequence of cells
+    def next_cell(row, col, end_row, end_col)
+      row_move = 0
+      col_move = 0
+
+      col_move = (end_col - col) / (end_col - col).abs if end_col != col
+      row_move = (end_row - row) / (end_row - row).abs if end_row != row
+
+      [row + row_move, col + col_move]
+    end
+
+    # Given a linear path, check whether there exists an unblocked path.
+    # It msut be checked beforehand that the path is indeed linear
+    #
+    # @param [Integer] row
+    # @param [Integer] col
+    # @param [Integer] end_row
+    # @param [Integer] end_col
+    #
+    # @return [Boolean] true if there exists a clear path
+    def clear_path?(row, col, end_row, end_col)
+      current_tile = get_piece_at([row, col])
+
+      if (row == end_row) && (col == end_col)
+        current_tile.nil? || (current_tile.owner != @owner)
+      elsif current_tile.nil? || current_tile.equal?(self)
+        next_row, next_col = next_cell(row, col, end_row, end_col)
+        clear_path?(next_row, next_col, end_row, end_col)
+      else
+        false
+      end
+    end
 
     # Check a single row for consecutive pieces
     #

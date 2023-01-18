@@ -2,7 +2,6 @@
 
 # All classes in this script are intended to be abstract, meaning they should
 # not be called on their own.
-
 module BoardgameEngine
   # Class representing a player in a game
   class Player
@@ -29,17 +28,17 @@ module BoardgameEngine
     EXIT_INSTRUCTIONS ||= "Try a sample input or input 'back' to leave the " \
     "tutorial. Type in 'exit' anytime to exit the game fully"
     GAME_NAME = 'Boardgame'
+    NUM_PLAYERS = 2
 
     # Begins a round of the Game
     #
     # @param [Boolean] do_onboarding optional argument on whether to do
     # onboarding
-    # @param [Integer] num_players the number of players
     #
     # @return [void]
-    def self.play(do_onboarding: true, num_players: 2)
+    def self.start(do_onboarding: true)
       names = []
-      num_players.times do |i|
+      self.class::NUM_PLAYERS.times do |i|
         puts "What is Player #{i}'s name?"
         names.push(gets.chomp)
       end
@@ -49,7 +48,7 @@ module BoardgameEngine
       puts "Welcome to #{@game}!"
       @game.onboarding if do_onboarding
       puts "Starting #{@game}..."
-      @game.start
+      @game.play
     end
 
     # String representation of the game
@@ -61,13 +60,20 @@ module BoardgameEngine
 
     protected
 
+    # Constructor for a board game. Kept private so that an object of just class
+    # BoardGame cannot be instantiated without being inherited. It essentially
+    # keeps it as an abstract class
+    #
+    # @param [Board] board the board to play on
+    # @param [Array<String>] names the names of the players
     def initialize(board, names)
       @players = names.map { |name| Player.new name }
       @board = setup_board(board)
       @winner = nil
     end
 
-    # Execute onboarding sequence
+    # Execute onboarding sequence where the player is asked if they want a 
+    # tutorial
     #
     # @return [void]
     def onboarding
@@ -84,6 +90,7 @@ module BoardgameEngine
       end
     end
 
+    # Run tutorial for the game
     def tutorial
       puts self.class::PLAY_INSTRUCTIONS + self.class::EXIT_INSTRUCTIONS
       input = gets.chomp
@@ -94,7 +101,12 @@ module BoardgameEngine
       end
     end
 
-    def start(turn = @players[0])
+    # Play the game
+    #
+    # @param [Player] turn the player who is going first
+    #
+    # @return [void]
+    def play(turn = @players[0])
       @turn = turn
       @board.display
       until @winner
@@ -104,6 +116,12 @@ module BoardgameEngine
       puts "#{@winner} wins!"
     end
 
+    # Prompts a user for a board input until a proper input is received
+    #
+    # @param [Array<String>] special_commands a list of commands that are not
+    # valid board input but are valid commands like "back"
+    #
+    # @return [String] a valid input
     def get_valid_board_input(special_commands = [])
       input = gets.chomp
 
@@ -117,6 +135,11 @@ module BoardgameEngine
       input
     end
 
+    # Setup the board
+    #
+    # @param [Class] board the class of the board to be used in the game
+    #
+    # @return [Board] a new board
     def setup_board(board)
       board.new
     end
@@ -138,45 +161,6 @@ module BoardgameEngine
 
     def to_s
       @name.to_s
-    end
-
-    protected
-
-    def clear_diag_path?(row, col, end_row, end_col, board)
-      ((end_row - row).abs == (end_col - col).abs) \
-      && clear_path?(row, col, end_row, end_col, board)
-    end
-
-    def clear_horz_path?(row, col, end_row, end_col, board)
-      (end_row == row) && clear_path?(row, col, end_row, end_col, board)
-    end
-
-    def clear_vert_path?(row, col, end_row, end_col, board)
-      (end_col == col) && clear_path?(row, col, end_row, end_col, board)
-    end
-
-    private
-
-    def next_cell(row, col, end_row, end_col)
-      row_move = 0
-      col_move = 0
-
-      col_move = (end_col - col) / (end_col - col).abs if end_col != col
-      row_move = (end_row - row) / (end_row - row).abs if end_row != row
-
-      [row + row_move, col + col_move]
-    end
-
-    def clear_path?(row, col, end_row, end_col, board)
-      current_tile = board.dig(row, col)
-      if (row == end_row) && (col == end_col)
-        current_tile.nil? || (current_tile.owner != @owner)
-      elsif current_tile.nil? || current_tile.equal?(self)
-        next_row, next_col = next_cell(row, col, end_row, end_col)
-        clear_path?(next_row, next_col, end_row, end_col, board)
-      else
-        false
-      end
     end
   end
 end
