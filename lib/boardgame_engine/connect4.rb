@@ -4,8 +4,33 @@ require 'boardgame_engine/boardgame'
 require 'boardgame_engine/game_modules'
 require 'boardgame_engine/board_modules'
 
-module SampleConnect4
-  class Connect4Board < BoardgameEngine::Board
+# module for playing a game of Connect-4
+module Connect4
+  # A game of Connect-4
+  class Connect4Game < BoardgameEngine::Boardgame
+    include Games::CyclicalTurn
+
+    PLAY_INSTRUCTIONS = 'You can select which column to drop you chip into by' \
+    ' typing in the row number.'
+    GAME_NAME = 'Connect-4'
+
+    def initialize(names)
+      super(Connect4Board, names)
+    end
+
+    private
+
+    def play_turn
+      puts "#{@turn}'s turn\nChoose a column to drop your chip in"
+      col = get_valid_board_input.to_i
+      @board.drop_chip(col, @turn)
+      @winner = @turn if @board.consecutive?
+      change_turn
+    end
+  end
+
+  # The Connect-4 board
+  class Connect4Board
     include Boards::Grid
 
     def initialize
@@ -27,31 +52,6 @@ module SampleConnect4
 
     def valid_board_input?(input)
       super(input, only_col: true)
-    end
-  end
-
-  class Connect4 < BoardgameEngine::Boardgame
-    include Games::CyclicalTurn
-
-    @instructions = 'You can select which column to drop you chip into by' \
-    ' typing in the row number.'
-
-    def initialize(names)
-      super(Connect4Board, @instructions, names)
-    end
-
-    def to_s
-      super('connect-four')
-    end
-
-    private
-
-    def play_turn
-      puts "#{@turn}'s turn\nChoose a column to drop your chip in"
-      col = get_valid_board_input.to_i
-      @board.drop_chip(col, @turn)
-      @winner = @turn if @board.consecutive?
-      change_turn
     end
   end
 end

@@ -4,8 +4,41 @@ require 'boardgame_engine/boardgame'
 require 'boardgame_engine/game_modules'
 require 'boardgame_engine/board_modules'
 
-module SampleChess
-  class ChessBoard < BoardgameEngine::Board
+# module for playing a game of chess
+module Chess
+  # Class for a game of chess
+  class ChessGame < BoardgameEngine::Boardgame
+    include Games::CyclicalTurn
+    include Games::MovablePiece
+
+    PLAY_INSTRUCTIONS = 'You can select spots on the board by inputting the ' \
+    "row and column with a comma in between. See example below\n1, 1\n"
+    GAME_NAME = 'Chess'
+
+    def initialize(names)
+      super(ChessBoard, names)
+    end
+
+    private
+
+    def valid_piece?(piece)
+      !piece.nil? && piece.owner == @turn
+    end
+
+    def play_turn
+      puts "#{@turn}'s turn"
+      killed = play_move
+      @winner = @turn if killed.is_a?(King)
+      change_turn
+    end
+
+    def setup_board(board)
+      board.new(@players[0], @players[1])
+    end
+  end
+
+  # Class for a chessboard
+  class ChessBoard
     include Boards::Grid
     include Boards::MovablePiece
 
@@ -38,38 +71,6 @@ module SampleChess
         @board[0][idx] = piece.new(player1)
         @board[7][7 - idx] = piece.new(player2)
       end
-    end
-  end
-
-  class Chess < BoardgameEngine::Boardgame
-    include Games::CyclicalTurn
-    include Games::MovablePiece
-
-    def initialize(names)
-      @instructions = 'You can select spots on the board by inputting the row' \
-      " and column with a comma in between. See example below\n1, 1\n"
-      super(ChessBoard, @instructions, names)
-    end
-
-    def to_s
-      super('chess')
-    end
-
-    private
-
-    def valid_piece?(piece)
-      !piece.nil? && piece.owner == @turn
-    end
-
-    def play_turn
-      puts "#{@turn}'s turn"
-      killed = play_move
-      @winner = @turn if killed.is_a?(King)
-      change_turn
-    end
-
-    def setup_board(board)
-      board.new(@players[0], @players[1])
     end
   end
 

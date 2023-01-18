@@ -4,30 +4,20 @@
 # not be called on their own.
 
 module BoardgameEngine
-  # Class representing a physical board comprised of a grid in a board game. It
-  # acts as both the View and Model if the project were to be compared to a MVC
-  # model. It plays both roles as the board in a board game not only stores data,
-  # but also IS the data that must be shown to the players.
-  class Board
-    attr_reader :board
-
-    private
-
-    def spot_playable?(piece, row, col)
-      piece.possible_moves.include? [row, col]
-    end
-  end
-
   # Class representing a player in a game
   class Player
     attr_reader :name
 
     # Creates a player object with the given name
-    # @param [String] name
+    #
+    # @param [String] name the name of the player
     def initialize(name)
       @name = name
     end
 
+    # String representation of player
+    #
+    # @return [String] the name of the player
     def to_s
       @name.to_s
     end
@@ -35,16 +25,18 @@ module BoardgameEngine
 
   # Class representing a board game.
   class Boardgame
+    PLAY_INSTRUCTIONS = ''
     EXIT_INSTRUCTIONS ||= "Try a sample input or input 'back' to leave the " \
     "tutorial. Type in 'exit' anytime to exit the game fully"
+    GAME_NAME = 'Boardgame'
 
-    def initialize(board, instructions, names)
-      @players = names.map { |name| Player.new name }
-      @board = setup_board(board)
-      @instructions = instructions
-      @winner = nil
-    end
-
+    # Begins a round of the Game
+    #
+    # @param [Boolean] do_onboarding optional argument on whether to do
+    # onboarding
+    # @param [Integer] num_players the number of players
+    #
+    # @return [void]
     def self.play(do_onboarding: true, num_players: 2)
       names = []
       num_players.times do |i|
@@ -60,10 +52,24 @@ module BoardgameEngine
       @game.start
     end
 
-    def to_s(game_name = 'boardgame')
-      "#{game_name} between #{@players.join(', ')}"
+    # String representation of the game
+    #
+    # @return [String] <description>
+    def to_s
+      "#{self.class::GAME_NAME} between #{@players.join(', ')}"
     end
 
+    protected
+
+    def initialize(board, names)
+      @players = names.map { |name| Player.new name }
+      @board = setup_board(board)
+      @winner = nil
+    end
+
+    # Execute onboarding sequence
+    #
+    # @return [void]
     def onboarding
       puts "Would you like a tutorial on how to play on this program? \n(y, n)"
 
@@ -79,11 +85,11 @@ module BoardgameEngine
     end
 
     def tutorial
-      puts @instructions + Boardgame::EXIT_INSTRUCTIONS
+      puts self.class::PLAY_INSTRUCTIONS + self.class::EXIT_INSTRUCTIONS
       input = gets.chomp
       until input == 'back'
         exit if input == 'exit'
-        puts valid_input?(input) ? 'Valid input!' : 'Invalid input'
+        puts valid_input?(input) ? 'Valid input' : 'Invalid input'
         input = gets.chomp
       end
     end
@@ -97,8 +103,6 @@ module BoardgameEngine
       end
       puts "#{@winner} wins!"
     end
-
-    protected
 
     def get_valid_board_input(special_commands = [])
       input = gets.chomp

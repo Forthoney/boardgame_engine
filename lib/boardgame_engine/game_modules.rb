@@ -18,12 +18,12 @@ module Games
     # @return [void]
     def play_move
       puts 'Select your piece'
-      piece, row, col = select_piece_from_input
+      piece, start_loc = select_piece_from_input
       puts "Select where to move \"#{piece}\" to. Type \"back\" to reselect piece"
-      dest = select_destination(piece, row, col)
-      return play_move if dest == 'back'
+      end_loc = select_destination(piece, start_loc)
+      return play_move if end_loc == 'back'
 
-      @board.move_piece([row, col], dest)
+      @board.move_piece(start_loc, end_loc)
     end
 
     private
@@ -45,7 +45,7 @@ module Games
 
     # Select a location on the board to move to from user input
     #
-    # @param [<Type>] piece The piece to move
+    # @param [Piece] piece The piece to move
     # @param [<Type>] start_location the starting location of the piece
     #
     # @return [<Type>] the location of the piece or the string literal 'back'
