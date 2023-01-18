@@ -22,8 +22,9 @@ module BoardgameEngine
     end
   end
 
-  # Class representing a board game.
-  class Boardgame
+  # Class representing the game loop. It contains the tutorial sequence and
+  # information about the core gameplay loop
+  class Game
     PLAY_INSTRUCTIONS = ''
     EXIT_INSTRUCTIONS ||= "Try a sample input or input 'back' to leave the " \
     "tutorial. Type in 'exit' anytime to exit the game fully"
@@ -38,7 +39,7 @@ module BoardgameEngine
     # @return [void]
     def self.start(do_onboarding: true)
       names = []
-      self.class::NUM_PLAYERS.times do |i|
+      self::NUM_PLAYERS.times do |i|
         puts "What is Player #{i}'s name?"
         names.push(gets.chomp)
       end
@@ -49,6 +50,39 @@ module BoardgameEngine
       @game.onboarding if do_onboarding
       puts "Starting #{@game}..."
       @game.play
+    end
+
+    # Execute onboarding sequence where the player is asked if they want a
+    # tutorial
+    #
+    # @return [void]
+    def onboarding
+      puts "Would you like a tutorial on how to play on this program? \n(y, n)"
+
+      case gets.chomp
+      when 'y'
+        tutorial
+      when 'n'
+        puts 'Skipping Tutorial'
+      else
+        puts 'Please answer either "y" or "n"'
+        onboarding
+      end
+    end
+
+    # Play the game
+    #
+    # @param [Player] turn the player who is going first
+    #
+    # @return [void]
+    def play(turn = @players[0])
+      @turn = turn
+      @board.display
+      until @winner
+        play_turn
+        @board.display
+      end
+      puts "#{@winner} wins!"
     end
 
     # String representation of the game
@@ -72,48 +106,15 @@ module BoardgameEngine
       @winner = nil
     end
 
-    # Execute onboarding sequence where the player is asked if they want a 
-    # tutorial
-    #
-    # @return [void]
-    def onboarding
-      puts "Would you like a tutorial on how to play on this program? \n(y, n)"
-
-      case gets.chomp
-      when 'y'
-        tutorial
-      when 'n'
-        puts 'Skipping Tutorial'
-      else
-        puts 'Please answer either "y" or "n"'
-        onboarding
-      end
-    end
-
     # Run tutorial for the game
     def tutorial
       puts self.class::PLAY_INSTRUCTIONS + self.class::EXIT_INSTRUCTIONS
       input = gets.chomp
       until input == 'back'
         exit if input == 'exit'
-        puts valid_input?(input) ? 'Valid input' : 'Invalid input'
+        puts @board.valid_board_input?(input) ? 'Valid input' : 'Invalid input'
         input = gets.chomp
       end
-    end
-
-    # Play the game
-    #
-    # @param [Player] turn the player who is going first
-    #
-    # @return [void]
-    def play(turn = @players[0])
-      @turn = turn
-      @board.display
-      until @winner
-        play_turn
-        @board.display
-      end
-      puts "#{@winner} wins!"
     end
 
     # Prompts a user for a board input until a proper input is received

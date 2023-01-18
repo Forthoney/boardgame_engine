@@ -118,8 +118,6 @@ module Boards
       input.split(',').map(&:to_i)
     end
 
-    protected
-
     # Make a 2D Array representing the board
     #
     # @param [Integer] row the number of rows

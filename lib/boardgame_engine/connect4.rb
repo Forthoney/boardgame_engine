@@ -7,7 +7,7 @@ require 'boardgame_engine/board_modules'
 # module for playing a game of Connect-4
 module Connect4
   # A game of Connect-4
-  class Connect4Game < BoardgameEngine::Boardgame
+  class Game < BoardgameEngine::Game
     include Games::CyclicalTurn
 
     PLAY_INSTRUCTIONS = 'You can select which column to drop you chip into by' \
@@ -16,7 +16,7 @@ module Connect4
     NUM_PLAYERS = 2
 
     def initialize(names)
-      super(Connect4Board, names)
+      super(Board, names)
     end
 
     private
@@ -25,13 +25,13 @@ module Connect4
       puts "#{@turn}'s turn\nChoose a column to drop your chip in"
       col = get_valid_board_input.to_i
       @board.drop_chip(col, @turn)
-      @winner = @turn if @board.consecutive?
+      @winner = @turn if @board.consecutive? 4
       change_turn
     end
   end
 
   # The Connect-4 board
-  class Connect4Board
+  class Board
     include Boards::Grid
 
     def initialize

@@ -7,18 +7,17 @@ require 'boardgame_engine/board_modules'
 # module for playing a game of chess
 module Chess
   # Class for a game of chess
-  class ChessGame < BoardgameEngine::Boardgame
+  class Game < BoardgameEngine::Game
     include Games::CyclicalTurn
     include Games::MovablePiece
 
     PLAY_INSTRUCTIONS = 'You can select spots on the board by inputting the ' \
     "row and column with a comma in between. See example below\n1, 1\n"
-
     GAME_NAME = 'Chess'
     NUM_PLAYERS = 2
 
     def initialize(names)
-      super(ChessBoard, names)
+      super(Board, names)
     end
 
     private
@@ -46,7 +45,7 @@ module Chess
   end
 
   # Class for a chessboard
-  class ChessBoard
+  class Board
     include Boards::Grid
     include Boards::MovablePiece
 
