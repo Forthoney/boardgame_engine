@@ -81,6 +81,7 @@ module BoardgameEngine
       until @winner
         play_turn
         @board.display
+        change_turn
       end
       puts "#{@winner} wins!"
     end

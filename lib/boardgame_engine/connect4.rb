@@ -26,7 +26,6 @@ module Connect4
       col = get_valid_board_input.to_i
       @board.drop_chip(col, @turn)
       @winner = @turn if @board.consecutive? 4
-      change_turn
     end
   end
 

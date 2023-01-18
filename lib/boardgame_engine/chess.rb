@@ -36,7 +36,6 @@ module Chess
       puts "#{@turn}'s turn"
       killed = play_move
       @winner = @turn if killed.is_a?(King)
-      change_turn
     end
 
     def setup_board(board)
